@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Navbar with Smooth Transition</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        .navbar {
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: border-color 0.5s ease;
+        }
+        .navbar a {
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            transition: color 0.3s;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            color:#3498db !important;
+        }
+        .content {
+            padding: 40px 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: #3498db;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" data-page="home">Home</a>
+        <a href="#" data-page="about">About</a>
+        <a href="#" data-page="contact">Contact</a>
+    </nav>
+    
+    <div class="content">
+        <h1 id="page-title">Welcome to the Home Page</h1>
+        <p id="page-content">This is the home page content. Explore our site to learn more about our services and offerings.</p>
+    </div>
+
+    <div class="page-transition"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script>
+        const navLinks = document.querySelectorAll('.navbar a');
+        const pageTitle = document.getElementById('page-title');
+        const pageContent = document.getElementById('page-content');
+        const pageTransition = document.querySelector('.page-transition');
+        const body = document.body;
+        const navbar = document.querySelector('.navbar');
+
+        const pages = {
+            home: {
+                title: 'Welcome to the Home Page',
+                content: 'This is the home page content. Explore our site to learn more about our services and offerings.',
+                bgColor: 'white',
+                textColor: 'black'
+            },
+            about: {
+                title: 'About Us',
+                content: 'Learn more about our company and mission. We are dedicated to providing the best service to our customers.',
+                bgColor: 'black',
+                textColor: 'white'
+            },
+            contact: {
+                title: 'Contact Us',
+                content: 'Get in touch with us for any inquiries. We\'re always here to help and answer your questions.',
+                bgColor: 'white',
+                textColor: 'black'
+            }
+        };
+
+        function changePage(page) {
+            const timeline = gsap.timeline();
+
+            timeline.to(pageTransition, {
+                duration: 0.5,
+                left: '0%',
+                ease: "power2.inOut"
+            })
+            .call(() => {
+                pageTitle.textContent = pages[page].title;
+                pageContent.textContent = pages[page].content;
+                body.style.backgroundColor = pages[page].bgColor;
+                body.style.color = pages[page].textColor;
+                navbar.style.borderColor = pages[page].bgColor === 'white' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+                navLinks.forEach(link => {
+                    link.style.color = pages[page].textColor;
+                });
+                gsap.set([pageTitle, pageContent], { opacity: 0 });
+            })
+            .to(pageTransition, {
+                duration: 0.5,
+                left: '100%',
+                ease: "power2.inOut"
+            })
+            .to([pageTitle, pageContent], {
+                duration: 0.5,
+                opacity: 1,
+                stagger: 0.1,
+                ease: "power2.out"
+            }, "-=0.3")
+            .set(pageTransition, { left: '-100%' });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.getAttribute('data-page');
+                changePage(page);
+            });
+        });
+
+        // Set initial page state without animation
+        function setInitialPage() {
+            const page = 'home';
+            pageTitle.textContent = pages[page].title;
+            pageContent.textContent = pages[page].content;
+            body.style.backgroundColor = pages[page].bgColor;
+            body.style.color = pages[page].textColor;
+            navbar.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+            navLinks.forEach(link => {
+                link.style.color = pages[page].textColor;
+            });
+        }
+
+        // Initialize the first page without animation
+        setInitialPage();
+    </script>
+</body>
+</html>
